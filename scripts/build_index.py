@@ -48,8 +48,8 @@ if __name__ == "__main__":
     client = get_qdrant_client()
 
     # Creation de la collection
-    # recreate=False : on ne recrée pas si elle existe deja (idempotence)
-    create_collection(client, recreate=False)
+    # recreate=True : on recrée l'index pour inclure les nouveaux papers
+    create_collection(client, recreate=True)
     print()
 
     # Insertion de tous les embeddings
