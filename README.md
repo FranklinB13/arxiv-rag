@@ -24,6 +24,18 @@ Exemple de réponse générée :
 
 ---
 
+## Résultats d'évaluation
+
+Évalué sur 15 questions construites manuellement couvrant 5 domaines du corpus :
+
+| Métrique | Score | Interprétation |
+|----------|-------|----------------|
+| Faithfulness | **0.70** | 70% des affirmations sont tracées dans les documents |
+| Answer Relevancy | **0.80** | Les réponses adressent bien les questions posées |
+| Context Recall | **0.77** | Le retrieval trouve les bons chunks dans 77% des cas |
+
+---
+
 ## Architecture du pipeline
 
 ```
@@ -121,12 +133,15 @@ arxiv-rag/
 │   ├── build_embeddings.py   # génération embeddings en batch
 │   ├── build_index.py        # construction de l'index Qdrant
 │   ├── test_retrieval.py     # test qualité du retrieval
+│   ├── evaluate.py           # collecte des outputs RAG pour évaluation
+│   ├── compute_metrics.py    # calcul des métriques faithfulness/relevancy/recall
 │   └── app.py                # interface web Gradio
 ├── data/
 │   ├── raw/                  # PDFs téléchargés (gitignored)
 │   ├── processed/            # textes extraits (gitignored)
 │   ├── chunks/               # chunks JSON (gitignored)
 │   └── embeddings/           # vecteurs numpy (gitignored)
+├── evaluation_scores.json    # résultats de l'évaluation
 ├── pyproject.toml
 └── README.md
 ```
@@ -157,11 +172,14 @@ Couper le texte tous les N caractères sans tenir compte des paragraphes casse l
 **Le reranking n'est pas optionnel pour un usage sérieux.**
 Le retrieval dense seul donne des résultats plausibles. Le retrieval hybride + reranking donne des résultats corrects. La différence vient du cross-encoder qui voit la question et le passage ensemble — il évalue la pertinence de la paire, pas juste la proximité vectorielle.
 
+**Mesurer avant d'optimiser.**
+Sans métriques d'évaluation, on navigue à l'aveugle. Construire un eval set de 15 questions et mesurer faithfulness, answer relevancy et context recall a permis d'identifier que le retrieval (0.77) était meilleur que la fidélité (0.70) — ce qui oriente les prochaines itérations vers l'amélioration du prompt de génération plutôt que du retrieval.
+
 ---
 
 ## Roadmap
 
-- [ ] Évaluation quantitative avec Ragas (faithfulness, answer relevancy)
+- [x] Évaluation quantitative (faithfulness: 0.70, answer relevancy: 0.80, context recall: 0.77)
 - [ ] Streaming des réponses dans l'interface
 - [ ] Déploiement sur Hugging Face Spaces
 - [ ] Filtrage par métadonnées (année, topic, auteur)
@@ -171,5 +189,5 @@ Le retrieval dense seul donne des résultats plausibles. Le retrieval hybride + 
 
 ## Auteur
 
-**Franklin** — Étudiant ingénieur Mathématiques Appliquées / IA — CY Tech  
+**Franklin** — Étudiant ingénieur Mathématiques Appliquées / IA — CY Tech
 [GitHub](https://github.com/FranklinB13)
